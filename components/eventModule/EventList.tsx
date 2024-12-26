@@ -4,11 +4,9 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   Platform,
   Button,
-  Keyboard,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -54,11 +52,6 @@ const EventsList: React.FC<EventsListProps> = ({ eventsData, onFilterChange }) =
     handleFilter();
   };
 
-  const handleDismissPicker = () => {
-    setShowPicker({ type: null }); // Hide the picker
-    Keyboard.dismiss(); // Dismiss the keyboard
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -68,30 +61,24 @@ const EventsList: React.FC<EventsListProps> = ({ eventsData, onFilterChange }) =
 
       <View style={styles.filterContainer}>
         {/* From Date */}
-        <TextInput
-          style={styles.input}
-          placeholder="From Date (YYYY-MM-DD)"
-          value={fromDate}
-          onFocus={() => setShowPicker({ type: 'from' })}
-          onChangeText={(text) => {
-            setFromDate(text);
-            handleFilter();
-          }}
-          onSubmitEditing={handleDismissPicker} // Close picker on return
-        />
+        <TouchableOpacity
+          style={styles.dateField}
+          onPress={() => setShowPicker({ type: 'from' })}
+        >
+          <Text style={styles.dateText}>
+            {fromDate || 'From Date (YYYY-MM-DD)'}
+          </Text>
+        </TouchableOpacity>
 
         {/* To Date */}
-        <TextInput
-          style={styles.input}
-          placeholder="To Date (YYYY-MM-DD)"
-          value={toDate}
-          onFocus={() => setShowPicker({ type: 'to' })}
-          onChangeText={(text) => {
-            setToDate(text);
-            handleFilter();
-          }}
-          onSubmitEditing={handleDismissPicker} // Close picker on return
-        />
+        <TouchableOpacity
+          style={styles.dateField}
+          onPress={() => setShowPicker({ type: 'to' })}
+        >
+          <Text style={styles.dateText}>
+            {toDate || 'To Date (YYYY-MM-DD)'}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* DateTimePicker */}
@@ -141,7 +128,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 16,
   },
-  input: {
+  dateField: {
     flex: 1,
     marginHorizontal: 8,
     padding: 8,
@@ -149,6 +136,11 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 8,
     backgroundColor: '#fff',
+    justifyContent: 'center',
+  },
+  dateText: {
+    fontSize: 16,
+    color: '#555',
   },
   scrollContainer: {
     padding: 16,
