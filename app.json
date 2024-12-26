@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "ReactNativeCrashCourse",
-    "slug": "ReactNativeCrashCourse",
+    "name": "GreenRoots",
+    "slug": "greenroots",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "greenroots",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
