@@ -66,7 +66,7 @@ const EventsList: React.FC<EventsListProps> = ({ eventsData, onFilterChange }) =
           onPress={() => setShowPicker({ type: 'from' })}
         >
           <Text style={styles.dateText}>
-            {fromDate || 'From Date (YYYY-MM-DD)'}
+            {fromDate || 'From Date'}
           </Text>
         </TouchableOpacity>
 
@@ -76,7 +76,7 @@ const EventsList: React.FC<EventsListProps> = ({ eventsData, onFilterChange }) =
           onPress={() => setShowPicker({ type: 'to' })}
         >
           <Text style={styles.dateText}>
-            {toDate || 'To Date (YYYY-MM-DD)'}
+            {toDate || 'To Date'}
           </Text>
         </TouchableOpacity>
       </View>

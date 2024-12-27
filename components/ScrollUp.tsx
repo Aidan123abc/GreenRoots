@@ -3,7 +3,7 @@ import { View, StyleSheet, Animated, PanResponder, Dimensions, ScrollView } from
 
 const ScrollUpOverlay = ({ children }: { children: React.ReactNode }) => {
   const screenHeight = Dimensions.get('window').height;
-  const partiallyOpenHeight = screenHeight * 0.95; // Initial position (1/4th screen visible)
+  const partiallyOpenHeight = screenHeight * 0.7; // Initial position (1/4th screen visible)
   const fullyOpenHeight = screenHeight * 0.3; // Fully open position (only 30% of screen visible)
   const SWIPE_THRESHOLD = 50; // Minimum distance for swipe to trigger state change
 
