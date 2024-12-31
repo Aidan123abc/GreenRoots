@@ -1,19 +1,19 @@
 import React from 'react';
 import { View, ScrollView, StyleSheet, Text } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // Importing icon library
-import { useNavigation } from '@react-navigation/native'; // Importing navigation
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 import DiscussionModule from '@/components/discussionModule/discussionModule';
 
-
 const Discussions = () => {
-
   const discussionsData = [
     {
       id: 1,
       title: 'Community Recycling Initiative',
       postAuthor: 'EcoWarrior123',
-      latitude: 33.4942, // Near Scottsdale, AZ
-      longitude: -111.9261, // Near Scottsdale, AZ
+      latitude: 33.4942,
+      longitude: -111.9261,
       datePosted: '2024-12-20',
       description: 'Let’s discuss how we can improve recycling in our neighborhood.',
       imageLink: 'https://example.com/recycling-initiative.jpg',
@@ -43,8 +43,8 @@ const Discussions = () => {
       id: 2,
       title: 'Save the Local Pond',
       postAuthor: 'NatureLover89',
-      latitude: 33.4976, // Near Scottsdale, AZ
-      longitude: -111.9291, // Near Scottsdale, AZ
+      latitude: 33.4976,
+      longitude: -111.9291,
       datePosted: '2024-12-18',
       description: 'The local pond is getting polluted. Let’s brainstorm solutions.',
       imageLink: 'https://example.com/save-the-pond.jpg',
@@ -68,8 +68,8 @@ const Discussions = () => {
       id: 3,
       title: 'Renewable Energy Options for Our Community',
       postAuthor: 'SolarFanatic',
-      latitude: 33.4927, // Near Scottsdale, AZ
-      longitude: -111.9228, // Near Scottsdale, AZ
+      latitude: 33.4927,
+      longitude: -111.9228,
       datePosted: '2024-12-15',
       description: 'What renewable energy options can we explore for our community?',
       imageLink: 'https://example.com/renewable-energy.jpg',
@@ -102,53 +102,54 @@ const Discussions = () => {
       ],
     },
   ];
-  
-    const navigation = useNavigation();
-  
-    return (
-      <View style={styles.container}>
-        <ScrollView style={styles.scrollContainer}>
-          <View style={styles.header}>
-            <Text style={styles.title}>Discussions</Text>
-            <Ionicons name="chatbubbles" size={24} color="#333" style={styles.icon} />
-          </View>
-          {discussionsData.map((discussion) => (
-            <DiscussionModule
-              key={discussion.id}
-              data={discussion}
-              onPress={() => navigation.navigate('DiscussionDetails', { discussionId: discussion.id })}
-            />
-          ))}
-        </ScrollView>
-      </View>
-    );
-  };
-  
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      flexDirection: 'column',
-      backgroundColor: '#fff',
-    },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingBottom: 16,
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: '#333',
-    },
-    icon: {
-      marginLeft: 8,
-    },
-    scrollContainer: {
-      flex: 1,
-      padding: 16,
-      backgroundColor: '#fff',
-    },
-  });
-  
-  export default Discussions;
+
+  const colorScheme = useColorScheme();
+  const themeColors = Colors[colorScheme ?? 'light'];
+  const navigation = useNavigation();
+
+  return (
+    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
+      <ScrollView
+        style={[styles.scrollContainer, { backgroundColor: themeColors.background }]}
+      >
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: themeColors.text }]}>Discussions</Text>
+          <Ionicons name="chatbubbles" size={24} color={themeColors.icon} style={styles.icon} />
+        </View>
+        {discussionsData.map((discussion) => (
+          <DiscussionModule
+            key={discussion.id}
+            data={discussion}
+            onPress={() => navigation.navigate('DiscussionDetails', { discussionId: discussion.id })}
+          />
+        ))}
+      </ScrollView>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'column',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  icon: {
+    marginLeft: 8,
+  },
+  scrollContainer: {
+    flex: 1,
+    padding: 16,
+  },
+});
+
+export default Discussions;

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 type Comment = {
   id: number;
@@ -25,6 +27,9 @@ type DiscussionModuleProps = {
 };
 
 const CommentComponent: React.FC<{ comment: Comment }> = ({ comment }) => {
+  const colorScheme = useColorScheme();
+  const themeColors = Colors[colorScheme ?? 'light'];
+
   const getTimeDifference = (date: string) => {
     const currentDate = new Date();
     const postedDate = new Date(date);
@@ -47,10 +52,10 @@ const CommentComponent: React.FC<{ comment: Comment }> = ({ comment }) => {
   };
 
   return (
-    <View style={styles.commentContainer}>
-      <Text style={styles.commentAuthor}>{comment.postAuthor}</Text>
-      <Text style={styles.commentDate}>{getTimeDifference(comment.datePosted)}</Text>
-      <Text style={styles.commentText}>{comment.comment}</Text>
+    <View style={[styles.commentContainer, { backgroundColor: themeColors.cardBackground }]}>
+      <Text style={[styles.commentAuthor, { color: themeColors.text }]}>{comment.postAuthor}</Text>
+      <Text style={[styles.commentDate, { color: themeColors.icon }]}>{getTimeDifference(comment.datePosted)}</Text>
+      <Text style={[styles.commentText, { color: themeColors.text }]}>{comment.comment}</Text>
     </View>
   );
 };
@@ -68,6 +73,9 @@ const DiscussionModule: React.FC<DiscussionModuleProps> = ({ data, onPress }) =>
     comments,
   } = data;
 
+  const colorScheme = useColorScheme();
+  const themeColors = Colors[colorScheme ?? 'light'];
+  const darkGrayBackground = colorScheme === 'dark' ? '#2c2c2c' : themeColors.cardBackground;
   const defaultImage = require('@/public/default_profile.jpg');
 
   const getTimeDifference = (date: string) => {
@@ -98,24 +106,32 @@ const DiscussionModule: React.FC<DiscussionModuleProps> = ({ data, onPress }) =>
   const timeDifference = getTimeDifference(datePosted);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: darkGrayBackground }]}>
       <View style={styles.header}>
         <Image
           source={imageLink ? { uri: imageLink } : defaultImage}
           style={styles.image}
         />
         <View style={styles.authorContainer}>
-          <Text style={styles.postAuthor}>{postAuthor}</Text>
-          <Text style={styles.datePosted}>{timeDifference}</Text>
+          <Text style={[styles.postAuthor, { color: themeColors.text }]}>{postAuthor}</Text>
+          <Text style={[styles.datePosted, { color: themeColors.icon }]}>{timeDifference}</Text>
         </View>
       </View>
-      <Text style={styles.title}>{truncatedTitle}</Text>
-      <Text style={styles.description}>{truncatedDescription}</Text>
+      <Text style={[styles.title, { color: themeColors.text }]}>{truncatedTitle}</Text>
+      <Text style={[styles.description, { color: themeColors.text }]}>{truncatedDescription}</Text>
       <View style={styles.footer}>
         <TouchableOpacity
           onPress={() => setIsCommentsVisible((prev) => !prev)} // Toggle comments visibility
         >
-          {isCommentsVisible ? <Text style={styles.comments}>HIDE {numComments} COMMENTS</Text> : <Text style={styles.comments}>VIEW {numComments} COMMENTS</Text>}
+          {isCommentsVisible ? (
+            <Text style={[styles.comments, { color: themeColors.tint }]}>
+              HIDE {numComments} COMMENTS
+            </Text>
+          ) : (
+            <Text style={[styles.comments, { color: themeColors.tint }]}>
+              VIEW {numComments} COMMENTS
+            </Text>
+          )}
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.button}
@@ -125,7 +141,7 @@ const DiscussionModule: React.FC<DiscussionModuleProps> = ({ data, onPress }) =>
         </TouchableOpacity>
       </View>
       {isCommentsVisible && (
-        <View style={styles.commentsContainer}>
+        <View style={[styles.commentsContainer, { backgroundColor: darkGrayBackground }]}>
           {comments.map((comment) => (
             <CommentComponent key={comment.id} comment={comment} />
           ))}
@@ -139,7 +155,7 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
     padding: 16,
-    backgroundColor: '#fff',
+    borderRadius: 8,
     shadowColor: '#000',
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -163,11 +179,9 @@ const styles = StyleSheet.create({
   postAuthor: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
   },
   datePosted: {
     fontSize: 12,
-    color: '#666',
   },
   title: {
     fontSize: 24,
@@ -177,7 +191,6 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 14,
     marginBottom: 2,
-    color: '#444',
   },
   footer: {
     flexDirection: 'row',
@@ -188,7 +201,6 @@ const styles = StyleSheet.create({
   comments: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#19708D',
   },
   button: {
     backgroundColor: '#037A6A',
@@ -204,27 +216,23 @@ const styles = StyleSheet.create({
   commentsContainer: {
     marginTop: 12,
     padding: 12,
-    backgroundColor: '#fff',
     borderRadius: 8,
   },
   commentContainer: {
     marginBottom: 8,
     padding: 8,
-    backgroundColor: '#fff',
+    borderRadius: 8,
   },
   commentAuthor: {
     fontWeight: 'bold',
-    color: '#333',
     marginBottom: 4,
   },
   commentDate: {
     fontSize: 12,
-    color: '#666',
     marginBottom: 4,
   },
   commentText: {
     fontSize: 14,
-    color: '#444',
   },
 });
 

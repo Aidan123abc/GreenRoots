@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import ProgressBar from './progressBar';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 type PetitionData = {
   id: number;
@@ -32,6 +34,9 @@ const PetitionModule: React.FC<PetitionModuleProps> = ({ data, onPress }) => {
     petitionLink,
   } = data;
 
+  const colorScheme = useColorScheme();
+  const themeColors = Colors[colorScheme ?? 'light'];
+  const darkGrayBackground = colorScheme === 'dark' ? '#2c2c2c' : themeColors.cardBackground;
   const defaultImage = require('@/public/default_profile.jpg');
 
   const getTimeDifference = (date: string) => {
@@ -66,20 +71,27 @@ const PetitionModule: React.FC<PetitionModuleProps> = ({ data, onPress }) => {
   const timeDifference = getTimeDifference(datePosted);
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: darkGrayBackground,
+        },
+      ]}
+    >
       <View style={styles.header}>
         <Image
           source={imageLink ? { uri: imageLink } : defaultImage}
           style={styles.image}
         />
         <View style={styles.authorContainer}>
-          <Text style={styles.postAuthor}>{truncatedPostAuthor}</Text>
-          <Text style={styles.datePosted}>{timeDifference}</Text>
+          <Text style={[styles.postAuthor, { color: themeColors.text }]}>{truncatedPostAuthor}</Text>
+          <Text style={[styles.datePosted, { color: themeColors.icon }]}>{timeDifference}</Text>
         </View>
       </View>
-      <Text style={styles.title}>{truncatedTitle}</Text>
+      <Text style={[styles.title, { color: themeColors.text }]}>{truncatedTitle}</Text>
       <ProgressBar numSignatures={numSignatures} numSigsGotten={numSigsGotten} />
-      <Text style={styles.description}>{truncatedDescription}</Text>
+      <Text style={[styles.description, { color: themeColors.text }]}>{truncatedDescription}</Text>
       <View style={styles.footer}>
         <Text style={styles.signatures}>{numSigsGotten} SIGNATURES</Text>
         <View style={styles.buttons}>
@@ -108,7 +120,6 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
     padding: 16,
-    backgroundColor: '#fff',
     borderRadius: 8,
     shadowColor: '#000',
     shadowOpacity: 0.2,
@@ -133,11 +144,9 @@ const styles = StyleSheet.create({
   postAuthor: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
   },
   datePosted: {
     fontSize: 12,
-    color: '#666',
   },
   title: {
     fontSize: 24,
@@ -147,7 +156,6 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 14,
     marginBottom: 2,
-    color: '#444',
   },
   footer: {
     flexDirection: 'row',
@@ -164,7 +172,7 @@ const styles = StyleSheet.create({
   signatures: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#19708D',
+    color: '#19708D', // Always dark teal
   },
   button: {
     backgroundColor: '#037A6A',

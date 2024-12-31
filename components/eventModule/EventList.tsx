@@ -11,6 +11,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import EventsModule from '@/components/eventModule/eventModule';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 interface EventData {
   id: number;
@@ -32,6 +34,9 @@ interface EventsListProps {
 }
 
 const EventsList: React.FC<EventsListProps> = ({ eventsData, onFilterChange }) => {
+  const colorScheme = useColorScheme();
+  const themeColors = Colors[colorScheme ?? 'light'];
+
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [showPicker, setShowPicker] = useState<{ type: 'from' | 'to' | null }>({ type: null });
@@ -53,29 +58,41 @@ const EventsList: React.FC<EventsListProps> = ({ eventsData, onFilterChange }) =
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Events</Text>
-        <Ionicons name="calendar" size={24} color="#333" style={styles.icon} />
+        <Text style={[styles.title, { color: themeColors.text }]}>Events</Text>
+        <Ionicons name="calendar" size={24} color={themeColors.icon} style={styles.icon} />
       </View>
 
       <View style={styles.filterContainer}>
         {/* From Date */}
         <TouchableOpacity
-          style={styles.dateField}
+          style={[
+            styles.dateField,
+            {
+              backgroundColor: themeColors.cardBackground,
+              borderColor: themeColors.icon,
+            },
+          ]}
           onPress={() => setShowPicker({ type: 'from' })}
         >
-          <Text style={styles.dateText}>
+          <Text style={[styles.dateText, { color: themeColors.text }]}>
             {fromDate || 'From Date'}
           </Text>
         </TouchableOpacity>
 
         {/* To Date */}
         <TouchableOpacity
-          style={styles.dateField}
+          style={[
+            styles.dateField,
+            {
+              backgroundColor: themeColors.cardBackground,
+              borderColor: themeColors.icon,
+            },
+          ]}
           onPress={() => setShowPicker({ type: 'to' })}
         >
-          <Text style={styles.dateText}>
+          <Text style={[styles.dateText, { color: themeColors.text }]}>
             {toDate || 'To Date'}
           </Text>
         </TouchableOpacity>
@@ -90,11 +107,17 @@ const EventsList: React.FC<EventsListProps> = ({ eventsData, onFilterChange }) =
             display={Platform.OS === 'ios' ? 'inline' : 'default'}
             onChange={(event, selectedDate) => setTempDate(selectedDate || new Date())}
           />
-          <Button title="Confirm" onPress={handleConfirm} />
+          <Button
+            title="Confirm"
+            onPress={handleConfirm}
+            color={themeColors.tint}
+          />
         </View>
       )}
 
-      <ScrollView style={styles.scrollContainer}>
+      <ScrollView
+        style={[styles.scrollContainer, { backgroundColor: themeColors.background }]}
+      >
         {eventsData.map((event) => (
           <EventsModule key={event.id} data={event} />
         ))}
@@ -106,7 +129,6 @@ const EventsList: React.FC<EventsListProps> = ({ eventsData, onFilterChange }) =
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',
@@ -117,7 +139,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
   },
   icon: {
     marginLeft: 8,
@@ -133,14 +154,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     padding: 8,
     borderWidth: 1,
-    borderColor: '#ccc',
     borderRadius: 8,
-    backgroundColor: '#fff',
     justifyContent: 'center',
   },
   dateText: {
     fontSize: 16,
-    color: '#555',
   },
   scrollContainer: {
     padding: 16,

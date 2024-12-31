@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, StyleSheet, Dimensions, Image, Alert } from 'react-native';
-import MapView, { Marker, Circle } from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
 
@@ -18,6 +18,7 @@ type MapComponentProps = {
 
 const MapComponent: React.FC<MapComponentProps> = ({ markers }) => {
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const mapRef = useRef<MapView | null>(null);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -50,9 +51,24 @@ const MapComponent: React.FC<MapComponentProps> = ({ markers }) => {
     longitudeDelta: 0.0421,
   };
 
+  const handleMarkerPress = (latitude: number, longitude: number) => {
+    const centeredRegion = {
+      latitude,
+      longitude,
+      latitudeDelta: 0.01, // Zoom in closer
+      longitudeDelta: 0.01,
+    };
+
+    mapRef.current?.animateToRegion(centeredRegion, 500); // Smoothly animate to the location
+  };
+
   return (
     <View style={styles.container}>
-      <MapView style={styles.map} region={userLocation ? initialRegion : undefined}>
+      <MapView
+        ref={mapRef}
+        style={styles.map}
+        region={userLocation ? initialRegion : undefined}
+      >
         {/* User Location Marker */}
         {userLocation && (
           <Marker coordinate={userLocation}>
@@ -67,6 +83,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ markers }) => {
             coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
             title={marker.title}
             description={marker.description}
+            onPress={() => handleMarkerPress(marker.latitude, marker.longitude)}
             onCalloutPress={() => navigation.navigate('EventDetails', { eventId: marker.id })}
           >
             <Image source={require('@/public/Icon.png')} style={styles.markerIcon} />

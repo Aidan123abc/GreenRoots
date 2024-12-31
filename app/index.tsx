@@ -1,12 +1,16 @@
 import React from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-
-import TabLayout from './_layout'; // Adjust the path to your TabLayout component
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
+import MainLayout from './_layout';
 
 export default function Index() {
+  const colorScheme = useColorScheme();
+  const themeColors = Colors[colorScheme ?? 'light'];
+
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-        <TabLayout />
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: themeColors.background }}>
+        <MainLayout />
     </GestureHandlerRootView>
   );
 }

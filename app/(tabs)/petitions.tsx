@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, ScrollView, StyleSheet, Text } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // Importing icon library
-import { useNavigation } from '@react-navigation/native'; // Importing navigation
+import { FontAwesome5 } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import PetitionModule from '@/components/petitionModule/petitionModule';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Colors } from '@/constants/Colors';
 
 const petitionsData = [
   {
@@ -45,13 +47,15 @@ const petitionsData = [
 
 const Petitions = () => {
   const navigation = useNavigation();
+  const colorScheme = useColorScheme();
+  const themeColors = Colors[colorScheme ?? 'light'];
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.scrollContainer}>
+    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
+      <ScrollView style={[styles.scrollContainer, { backgroundColor: themeColors.background }]}>
         <View style={styles.header}>
-          <Text style={styles.title}>Petitions</Text>
-          <Ionicons name="pencil" size={24} color="#333" style={styles.icon} />
+          <Text style={[styles.title, { color: themeColors.text }]}>Petitions</Text>
+          <FontAwesome5 name="pen-nib" size={24} color={themeColors.icon} style={styles.icon} />
         </View>
         {petitionsData.map((petition) => (
           <PetitionModule
@@ -69,7 +73,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: '#f8f9fa',
   },
   header: {
     flexDirection: 'row',
@@ -80,7 +83,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
   },
   icon: {
     marginLeft: 8,
@@ -88,7 +90,6 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#f8f9fa',
   },
 });
 
