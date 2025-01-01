@@ -9,13 +9,15 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "package": "com.greenrootsapp.greenroots"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./public/Icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.greenrootsapp.greenroots"
     },
     "web": {
       "bundler": "metro",
