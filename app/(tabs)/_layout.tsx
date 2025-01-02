@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Image, StyleSheet, Platform, Modal, TouchableOpacity, Text } from 'react-native';
+import { View, Image, StyleSheet, Platform, Modal, TouchableOpacity, Text, Alert } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
@@ -33,12 +33,10 @@ const TabLayout = () => {
       // Add navigation logic here
     } else if (option === 'signOut') {
       try{
-        signOut()
+        signOut();
         navigation.replace('AuthLayout');
       } catch (error) {
-
-      } finally {
-
+        Alert.alert("Error" + error);
       }
     }
   };

@@ -14,7 +14,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
-import { signIn, getCurrentUser } from '@/lib/appwrite';
+import { signIn, getCurrentUser, signOut } from '@/lib/appwrite';
 import { useGlobalContext } from '@/context/GlobalProvider';
 
 const SignIn: React.FC = () => {
@@ -23,7 +23,7 @@ const SignIn: React.FC = () => {
   const themeColors = Colors[colorScheme ?? 'light'];
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // const { setUser, setIsLogged } = useGlobalContext();
+  const { setUser, setIsLogged } = useGlobalContext();
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -43,10 +43,11 @@ const SignIn: React.FC = () => {
     setIsSubmitting(true);
 
     try {
+      await signOut();
       await signIn(form.email, form.password);
       const result = await getCurrentUser();
-      // setUser(result);
-      // setIsLogged(true);
+      setUser(result);
+      setIsLogged(true);
 
       navigation.replace('TabLayout'); // Update with your navigation route
     } catch (error: any) {

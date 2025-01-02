@@ -14,7 +14,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
-import { createUser } from "@/lib/appwrite";
+import { createUser, signOut } from "@/lib/appwrite";
 import { useGlobalContext } from "@/context/GlobalProvider";
 
 const SignUp = () => {
@@ -24,7 +24,7 @@ const SignUp = () => {
 
   const [isSubmitting, setSubmitting] = useState(false);
 
-  // const { setUser, setIsLogged } = useGlobalContext();
+  const { setUser, setIsLogged } = useGlobalContext();
 
   const [form, setForm] = useState({
     username: '',
@@ -39,9 +39,10 @@ const SignUp = () => {
     }
 
     try {
+      await signOut();
       const result = await createUser(form.email, form.password, form.username);
-      // setUser(result);
-      // setIsLogged(true);
+      setUser(result);
+      setIsLogged(true);
       console.log(result);
 
       navigation.replace('TabLayout');
