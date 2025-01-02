@@ -14,6 +14,8 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
+import { createUser } from "@/lib/appwrite";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const SignUp = () => {
   const navigation = useNavigation();
@@ -21,6 +23,9 @@ const SignUp = () => {
   const themeColors = Colors[colorScheme ?? 'light'];
 
   const [isSubmitting, setSubmitting] = useState(false);
+
+  // const { setUser, setIsLogged } = useGlobalContext();
+
   const [form, setForm] = useState({
     username: '',
     email: '',
@@ -33,14 +38,18 @@ const SignUp = () => {
       return;
     }
 
-    setSubmitting(true);
+    try {
+      const result = await createUser(form.email, form.password, form.username);
+      // setUser(result);
+      // setIsLogged(true);
+      console.log(result);
 
-    // Simulate an API call
-    setTimeout(() => {
+      navigation.replace('TabLayout');
+    } catch (error) {
+      Alert.alert("Error", error.message);
+    } finally {
       setSubmitting(false);
-      Alert.alert('Success', 'User registered successfully');
-      navigation.replace('TabLayout'); // Adjust navigation target as needed
-    }, 2000);
+    }
   };
 
   return (
@@ -98,9 +107,9 @@ const SignUp = () => {
             <Text style={[styles.footerText, { color: themeColors.icon }]}>Already have an account?</Text>
             <Text
               style={[styles.footerLink, { color: themeColors.AuthButton }]}
-              onPress={() => navigation.navigate('SignIn')}
+              onPress={() => navigation.replace('SignIn')}
             >
-              Login
+              Log In
             </Text>
           </View>
         </View>

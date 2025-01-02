@@ -14,6 +14,8 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
+import { signIn, getCurrentUser } from '@/lib/appwrite';
+import { useGlobalContext } from '@/context/GlobalProvider';
 
 const SignIn: React.FC = () => {
   const navigation = useNavigation();
@@ -21,6 +23,7 @@ const SignIn: React.FC = () => {
   const themeColors = Colors[colorScheme ?? 'light'];
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // const { setUser, setIsLogged } = useGlobalContext();
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -31,6 +34,7 @@ const SignIn: React.FC = () => {
   };
 
   const handleSignIn = async () => {
+    
     if (!form.email || !form.password) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
@@ -39,12 +43,12 @@ const SignIn: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      // Replace with your sign-in logic (e.g., API call)
-      console.log('Signing in with:', form);
-      Alert.alert('Success', 'Signed in successfully');
+      await signIn(form.email, form.password);
+      const result = await getCurrentUser();
+      // setUser(result);
+      // setIsLogged(true);
 
-      // Navigate to the home page after successful sign-in
-      navigation.navigate('TabLayout'); // Update with your navigation route
+      navigation.replace('TabLayout'); // Update with your navigation route
     } catch (error: any) {
       Alert.alert('Error', error.message || 'An error occurred');
     } finally {
@@ -102,7 +106,7 @@ const SignIn: React.FC = () => {
 
         <View style={styles.footerContainer}>
           <Text style={[styles.footerText, { color: themeColors.icon }]}>Don't have an account?</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+          <TouchableOpacity onPress={() => navigation.replace('SignUp')}>
             <Text style={[styles.footerLink, { color: themeColors.AuthButton }]}>Sign Up</Text>
           </TouchableOpacity>
         </View>

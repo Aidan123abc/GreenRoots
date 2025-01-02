@@ -4,6 +4,7 @@ import { View, Image, StyleSheet, Platform, Modal, TouchableOpacity, Text } from
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
+import { useNavigation } from 'expo-router';
 
 // Importing screens
 import HomeScreen from './home';
@@ -11,9 +12,13 @@ import EventsStack from '@/components/eventModule/EventsStack';
 import DiscussionsScreen from './discussions';
 import PetitionsStack from '@/components/petitionModule/petitionStack';
 
+
+import { signOut } from '@/lib/appwrite';
+
 const Tab = createBottomTabNavigator();
 
 const TabLayout = () => {
+  const navigation = useNavigation();
   const colorScheme = useColorScheme();
   const themeColors = Colors[colorScheme ?? 'light'];
   const borderColor = colorScheme === 'dark' ? themeColors.background : '#d3d3d3';
@@ -27,8 +32,14 @@ const TabLayout = () => {
       console.log('Navigating to My Profile...');
       // Add navigation logic here
     } else if (option === 'signOut') {
-      console.log('Signing Out...');
-      // Add sign-out logic here
+      try{
+        signOut()
+        navigation.replace('AuthLayout');
+      } catch (error) {
+
+      } finally {
+
+      }
     }
   };
 
@@ -37,7 +48,6 @@ const TabLayout = () => {
       {/* Header */}
       <View style={[styles.header, { backgroundColor: themeColors.background, borderBottomColor: borderColor }]}>
         <View style={styles.subheader}>
-          <Image source={require('@/public/Icon.png')} style={styles.icon} />
           <Image source={require('@/public/greenroots.png')} style={styles.title} />
         </View>
         <TouchableOpacity onPress={handleProfilePress}>
