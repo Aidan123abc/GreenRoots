@@ -1,13 +1,14 @@
-import GlobalProvider from '@/context/GlobalProvider';
-import NavigationLogic from '@/components/NavigationLogic';
+import { View, Text } from 'react-native'
+import React from 'react'
+import GlobalProvider from '@/context/GlobalProvider'
+import PagesLayout from './(pages)/_layout'
 
 const MainLayout = () => {
-
   return (
     <GlobalProvider>
-      <NavigationLogic />
+        <PagesLayout />
     </GlobalProvider>
-  );
-};
+  )
+}
 
-export default MainLayout;
+export default MainLayout

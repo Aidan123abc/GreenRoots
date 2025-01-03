@@ -1,6 +1,6 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Events from '@/app/(tabs)/events';
+import Events from '@/app/(pages)/(tabs)/events';
 import EventDetails from './EventDetails';
 
 const Stack = createNativeStackNavigator();

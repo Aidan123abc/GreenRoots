@@ -11,8 +11,6 @@ import HomeScreen from './home';
 import EventsStack from '@/components/eventModule/EventsStack';
 import DiscussionsScreen from './discussions';
 import PetitionsStack from '@/components/petitionModule/petitionStack';
-
-
 import { signOut } from '@/lib/appwrite';
 
 const Tab = createBottomTabNavigator();
@@ -26,17 +24,26 @@ const TabLayout = () => {
 
   const handleProfilePress = () => setMenuVisible((prev) => !prev);
 
-  const handleMenuOption = (option: string) => {
+  const handleMenuOption = async (option: string) => {
     setMenuVisible(false);
     if (option === 'profile') {
       console.log('Navigating to My Profile...');
       // Add navigation logic here
     } else if (option === 'signOut') {
-      try{
-        signOut();
-        navigation.replace('AuthLayout');
+      try {
+        await signOut(); // Ensure signOut is asynchronous and completes successfully
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'AuthLayout' }], // Reset stack with a valid route
+        });
       } catch (error) {
-        Alert.alert("Error" + error);
+        if (error instanceof Error) {
+          // Narrow the type to `Error` to access `.message`
+          Alert.alert("Error", error.message);
+        } else {
+          // Fallback for unknown error types
+          Alert.alert("Error", "An unknown error occurred.");
+        }
       }
     }
   };

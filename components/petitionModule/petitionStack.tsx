@@ -1,6 +1,6 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Petitions from '@/app/(tabs)/petitions';
+import Petitions from '@/app/(pages)/(tabs)/petitions';
 import PetitionDetails from './PetitionsDetails';
 
 const Stack = createNativeStackNavigator();

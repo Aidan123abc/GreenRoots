@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   View,
@@ -10,12 +10,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
-import { createUser, signOut } from "@/lib/appwrite";
-import { useGlobalContext } from "@/context/GlobalProvider";
+import { createUser } from '@/lib/appwrite';
+import { useGlobalContext } from '@/context/GlobalProvider';
 
 const SignUp = () => {
   const navigation = useNavigation();
@@ -23,7 +25,6 @@ const SignUp = () => {
   const themeColors = Colors[colorScheme ?? 'light'];
 
   const [isSubmitting, setSubmitting] = useState(false);
-
   const { setUser, setIsLogged } = useGlobalContext();
 
   const [form, setForm] = useState({
@@ -32,36 +33,67 @@ const SignUp = () => {
     password: '',
   });
 
+  // Refs for input fields and scroll
+  const scrollViewRef = useRef<ScrollView>(null);
+  const emailInputRef = useRef<TextInput>(null);
+  const passwordInputRef = useRef<TextInput>(null);
+
+  const scrollToField = (yPosition: number) => {
+    scrollViewRef.current?.scrollTo({
+      y: yPosition,
+      animated: true,
+    });
+  };
+
   const submit = async () => {
     if (!form.username || !form.email || !form.password) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
+    setSubmitting(true);
+
     try {
-      await signOut();
-      const result = await createUser(form.email, form.password, form.username);
+      const result = await createUser(form.email.toLowerCase(), form.password, form.username);
       setUser(result);
       setIsLogged(true);
       console.log(result);
 
       navigation.replace('TabLayout');
-    } catch (error) {
-      Alert.alert("Error", error.message);
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'An error occurred');
     } finally {
       setSubmitting(false);
     }
   };
 
+  const backgroundImage =
+  colorScheme === 'dark'
+    ? require('@/public/MapDark.webp') // Dark mode map
+    : require('@/public/MapLight.webp'); // Light mode map
+
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: themeColors.background }]}>
-        <View style={styles.formContainer}>
+      <Image
+                source={backgroundImage}
+                style={styles.backgroundImage}
+                resizeMode="cover"
+              />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView
+          ref={scrollViewRef}
+          contentContainerStyle={styles.formContainer}
+          keyboardShouldPersistTaps="handled"
+        >
           <Image
             source={require('@/public/Icon.png')} // Replace with your logo path
             resizeMode="contain"
             style={styles.logo}
           />
-          <Text style={[styles.title, { color: themeColors.text }]}>Sign Up</Text>
+          <Text style={[styles.title, { color: themeColors.text }]}>Create an Account</Text>
 
           {/* Username Field */}
           <TextInput
@@ -70,20 +102,32 @@ const SignUp = () => {
             placeholderTextColor={themeColors.icon}
             value={form.username}
             onChangeText={(value) => setForm({ ...form, username: value })}
+            returnKeyType="next"
+            onSubmitEditing={() => {
+              scrollToField(100); // Adjust based on layout
+              emailInputRef.current?.focus();
+            }}
           />
 
           {/* Email Field */}
           <TextInput
+            ref={emailInputRef}
             style={[styles.input, { backgroundColor: themeColors.cardBackground, color: themeColors.text }]}
             placeholder="Email"
             placeholderTextColor={themeColors.icon}
             keyboardType="email-address"
             value={form.email}
             onChangeText={(value) => setForm({ ...form, email: value })}
+            returnKeyType="next"
+            onSubmitEditing={() => {
+              scrollToField(200); // Adjust based on layout
+              passwordInputRef.current?.focus();
+            }}
           />
 
           {/* Password Field */}
           <TextInput
+            ref={passwordInputRef}
             style={[styles.input, { backgroundColor: themeColors.cardBackground, color: themeColors.text }]}
             placeholder="Password"
             placeholderTextColor={themeColors.icon}
@@ -94,7 +138,10 @@ const SignUp = () => {
 
           {/* Submit Button */}
           <TouchableOpacity
-            style={[styles.button, isSubmitting ? styles.buttonDisabled : { backgroundColor: themeColors.AuthButton }]}
+            style={[
+              styles.button,
+              isSubmitting ? styles.buttonDisabled : { backgroundColor: themeColors.AuthButton },
+            ]}
             onPress={submit}
             disabled={isSubmitting}
           >
@@ -113,7 +160,8 @@ const SignUp = () => {
               Log In
             </Text>
           </View>
-        </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -123,12 +171,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   formContainer: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    paddingTop: '20%',
     alignItems: 'center',
     paddingHorizontal: 16,
-    minHeight: Dimensions.get('window').height - 100,
+    justifyContent: 'flex-start',
+    paddingTop: '20%',
+  },
+  backgroundImage: {
+    position: 'absolute',
+    width: '130%',
+    height: '130%',
+    opacity: 0.2
   },
   title: {
     fontSize: 24,
@@ -146,6 +198,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 12,
     marginBottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 2,
   },
   button: {
     width: '100%',
