@@ -1,128 +1,93 @@
-import React from 'react';
-import { View, ScrollView, StyleSheet, Text } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, ScrollView, StyleSheet, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
 import DiscussionModule from '@/components/discussionModule/discussionModule';
+import { getAllDiscussions  } from '@/lib/appwrite'; // Import the function to fetch discussions
+import { useFocusEffect } from '@react-navigation/native';
+
 
 const Discussions = () => {
-  const discussionsData = [
-    {
-      id: 1,
-      title: 'Community Recycling Initiative',
-      postAuthor: 'EcoWarrior123',
-      latitude: 33.4942,
-      longitude: -111.9261,
-      datePosted: '2024-12-20',
-      description: 'Let’s discuss how we can improve recycling in our neighborhood.',
-      imageLink: 'https://example.com/recycling-initiative.jpg',
-      numComments: 3,
-      comments: [
-        {
-          id: 101,
-          postAuthor: 'GreenGuru',
-          comment: 'Great idea! We could also host a recycling drive every month.',
-          datePosted: '2024-12-21',
-        },
-        {
-          id: 102,
-          postAuthor: 'EcoNewbie',
-          comment: 'I’m in! Can we get bins placed in the park as well?',
-          datePosted: '2024-12-22',
-        },
-        {
-          id: 103,
-          postAuthor: 'RecycleQueen',
-          comment: 'Love this. I can help create posters to spread awareness.',
-          datePosted: '2024-12-23',
-        },
-      ],
-    },
-    {
-      id: 2,
-      title: 'Save the Local Pond',
-      postAuthor: 'NatureLover89',
-      latitude: 33.4976,
-      longitude: -111.9291,
-      datePosted: '2024-12-18',
-      description: 'The local pond is getting polluted. Let’s brainstorm solutions.',
-      imageLink: 'https://example.com/save-the-pond.jpg',
-      numComments: 2,
-      comments: [
-        {
-          id: 201,
-          postAuthor: 'CleanWaterAct',
-          comment: 'We should report this to the local authorities and get it cleaned.',
-          datePosted: '2024-12-19',
-        },
-        {
-          id: 202,
-          postAuthor: 'EcoActivist',
-          comment: 'How about we organize a cleanup day and invite volunteers?',
-          datePosted: '2024-12-20',
-        },
-      ],
-    },
-    {
-      id: 3,
-      title: 'Renewable Energy Options for Our Community',
-      postAuthor: 'SolarFanatic',
-      latitude: 33.4927,
-      longitude: -111.9228,
-      datePosted: '2024-12-15',
-      description: 'What renewable energy options can we explore for our community?',
-      imageLink: 'https://example.com/renewable-energy.jpg',
-      numComments: 4,
-      comments: [
-        {
-          id: 301,
-          postAuthor: 'WindPowerGuru',
-          comment: 'We could look into installing wind turbines in open areas.',
-          datePosted: '2024-12-16',
-        },
-        {
-          id: 302,
-          postAuthor: 'SolarLover',
-          comment: 'Solar panels are a great option! They’re becoming more affordable too.',
-          datePosted: '2024-12-17',
-        },
-        {
-          id: 303,
-          postAuthor: 'GreenEngineer',
-          comment: 'Community solar farms could also be an option.',
-          datePosted: '2024-12-18',
-        },
-        {
-          id: 304,
-          postAuthor: 'RenewableRocks',
-          comment: 'Don’t forget about geothermal energy—it’s often overlooked!',
-          datePosted: '2024-12-19',
-        },
-      ],
-    },
-  ];
+  const [discussions, setDiscussions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const colorScheme = useColorScheme();
   const themeColors = Colors[colorScheme ?? 'light'];
   const navigation = useNavigation();
 
+  useFocusEffect(
+    useCallback(() => {
+      const fetchDiscussions = async () => {
+        try {
+          const data = await getAllDiscussions();
+          setDiscussions(data); // Now each discussion has a `.comments` array
+          // console.log("Discussion Data:", JSON.stringify(data, null, 2));
+        } catch (error) {
+          console.error('Error fetching discussions:', error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchDiscussions();
+    }, [])
+  );
+
+  useEffect(() => {
+    const fetchDiscussions = async () => {
+      try {
+        const data = await getAllDiscussions();
+        setDiscussions(data); // Now each discussion has a `.comments` array
+        // console.log("Discussion Data:", JSON.stringify(data, null, 2));
+      } catch (error) {
+        console.error('Error fetching discussions:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchDiscussions();
+  }, []);
+
   return (
     <View style={[styles.container, { backgroundColor: themeColors.background }]}>
-      <ScrollView
-        style={[styles.scrollContainer, { backgroundColor: themeColors.background }]}
-      >
+      <ScrollView style={[styles.scrollContainer, { backgroundColor: themeColors.background }]}>
         <View style={styles.header}>
           <Text style={[styles.title, { color: themeColors.text }]}>Discussions</Text>
           <Ionicons name="chatbubbles" size={24} color={themeColors.icon} style={styles.icon} />
         </View>
-        {discussionsData.map((discussion) => (
-          <DiscussionModule
-            key={discussion.id}
-            data={discussion}
-            onPress={() => navigation.navigate('DiscussionDetails', { discussionId: discussion.id })}
-          />
-        ))}
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate('CreateDiscussion')}
+        >
+          <Text style={styles.buttonText}>New Discussion</Text>
+        </TouchableOpacity>
+
+        {loading ? (
+          <ActivityIndicator size="large" color={themeColors.tint} style={styles.loading} />
+        ) : discussions.length > 0 ? (
+          discussions.map((discussion) => (
+            <DiscussionModule
+              key={discussion.$id} // Use Appwrite's unique document ID
+              data={{
+                id: discussion.$id,
+                title: discussion.title,
+                postAuthor: discussion.postAuthor,
+                datePosted: discussion.posted,
+                description: discussion.content,
+                comments: discussion.comments,
+              }}
+              onPress={() =>
+                navigation.navigate('DiscussionDetails', { discussionId: discussion.$id })
+              }
+            />
+          ))
+        ) : (
+          <Text style={[styles.noData, { color: themeColors.text }]}>No discussions available.</Text>
+        )}
       </ScrollView>
     </View>
   );
@@ -149,6 +114,29 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
     padding: 16,
+  },
+  button: {
+    backgroundColor: '#037A6A',
+    width: '60%',
+    alignSelf: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  loading: {
+    marginTop: 50,
+  },
+  noData: {
+    textAlign: 'center',
+    marginTop: 50,
+    fontSize: 16,
   },
 });
 

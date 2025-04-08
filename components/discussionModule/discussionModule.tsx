@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
+import { useNavigation } from 'expo-router';
 
 type Comment = {
-  id: number;
+  $id: number;
   postAuthor: string;
-  comment: string;
+  subject: string;
   datePosted: string;
+  likes: number;
 };
 
 type DiscussionData = {
@@ -53,9 +55,19 @@ const CommentComponent: React.FC<{ comment: Comment }> = ({ comment }) => {
 
   return (
     <View style={[styles.commentContainer, { backgroundColor: themeColors.cardBackground }]}>
-      <Text style={[styles.commentAuthor, { color: themeColors.text }]}>{comment.postAuthor}</Text>
+      <Text style={[styles.commentAuthor, { color: themeColors.text }]}>{comment.authorName}</Text>
       <Text style={[styles.commentDate, { color: themeColors.icon }]}>{getTimeDifference(comment.datePosted)}</Text>
-      <Text style={[styles.commentText, { color: themeColors.text }]}>{comment.comment}</Text>
+      <View style={{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}>
+        <Text style={[styles.commentText, { color: themeColors.text, flex: 1 }]}>{comment.subject}</Text>
+        <Text style={{
+          color: themeColors.icon, fontSize: 14,
+          marginLeft: 8,
+        }}>{comment.likes} Likes</Text>
+      </View>
     </View>
   );
 };
@@ -74,6 +86,7 @@ const DiscussionModule: React.FC<DiscussionModuleProps> = ({ data, onPress }) =>
   } = data;
 
   const colorScheme = useColorScheme();
+  const navigation = useNavigation();
   const themeColors = Colors[colorScheme ?? 'light'];
   const darkGrayBackground = colorScheme === 'dark' ? '#2c2c2c' : themeColors.cardBackground;
   const defaultImage = require('@/public/default_profile.jpg');
@@ -120,31 +133,36 @@ const DiscussionModule: React.FC<DiscussionModuleProps> = ({ data, onPress }) =>
       <Text style={[styles.title, { color: themeColors.text }]}>{truncatedTitle}</Text>
       <Text style={[styles.description, { color: themeColors.text }]}>{truncatedDescription}</Text>
       <View style={styles.footer}>
-        <TouchableOpacity
-          onPress={() => setIsCommentsVisible((prev) => !prev)} // Toggle comments visibility
-        >
-          {isCommentsVisible ? (
-            <Text style={[styles.comments, { color: themeColors.tint }]}>
-              HIDE {numComments} COMMENTS
-            </Text>
-          ) : (
-            <Text style={[styles.comments, { color: themeColors.tint }]}>
-              VIEW {numComments} COMMENTS
-            </Text>
-          )}
-        </TouchableOpacity>
+        {comments && comments.length > 0 && ( // Render the button only if comments exist
+          <TouchableOpacity
+            onPress={() => setIsCommentsVisible((prev) => !prev)} // Toggle comments visibility
+          >
+            {isCommentsVisible ? (
+              <Text style={[styles.comments, { color: themeColors.tint }]}>
+                HIDE {numComments} COMMENTS
+              </Text>
+            ) : (
+              <Text style={[styles.comments, { color: themeColors.tint }]}>
+                VIEW {numComments} COMMENTS
+              </Text>
+            )}
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           style={styles.button}
-          onPress={onPress}
+          onPress={() => navigation.navigate('DiscussionDetails', { discussionId: data.id })}
         >
           <Text style={styles.buttonText}>View</Text>
         </TouchableOpacity>
       </View>
-      {isCommentsVisible && (
+      {isCommentsVisible && comments && comments.length > 0 && (
         <View style={[styles.commentsContainer, { backgroundColor: darkGrayBackground }]}>
-          {comments.map((comment) => (
-            <CommentComponent key={comment.id} comment={comment} />
-          ))}
+          {comments
+            .sort((a, b) => (b.likes ?? 0) - (a.likes ?? 0)) // Sort descending by likes
+            .slice(0, 3) // Only show top 3
+            .map((comment) => (
+              <CommentComponent key={comment.$id} comment={comment} />
+            ))}
         </View>
       )}
     </View>
@@ -160,6 +178,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 2,
+    minHeight: 200,
   },
   header: {
     flexDirection: 'row',
@@ -207,6 +226,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 8,
     borderRadius: 20,
+    position: 'absolute',
+    right: '8',
   },
   buttonText: {
     color: '#fff',

@@ -9,7 +9,7 @@ import { useNavigation } from 'expo-router';
 // Importing screens
 import HomeScreen from './home';
 import EventsStack from '@/components/eventModule/EventsStack';
-import DiscussionsScreen from './discussions';
+import DiscissionStack from '@/components/discussionModule/discussionStack';
 import PetitionsStack from '@/components/petitionModule/petitionStack';
 import { signOut } from '@/lib/appwrite';
 
@@ -129,7 +129,7 @@ const TabLayout = () => {
         />
         <Tab.Screen
           name="Discussions"
-          component={DiscussionsScreen}
+          component={DiscissionStack}
           options={{
             title: 'Discussions',
             tabBarIcon: ({ color }) => <FontAwesome5 name="comments" size={24} color={color} />,
